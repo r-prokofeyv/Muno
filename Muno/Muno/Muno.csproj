@@ -1,0 +1,126 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Muno</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Libs\ffmpeg.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\audio_analyzer.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\audio_visualizer.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\boost_filesystem.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\boost_iostreams.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\boost_math_tr1.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\boost_serialization.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\boost_system.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\build_test.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\clear_mixer.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\effect_test.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\libbz2.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\phase_limiter.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\sndfile.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\snd_file_info.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\spectrogram.exe" />
+    <None Remove="Libs\PhaseLimiter\bin\tbb.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\tbbmalloc.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\zlib.dll" />
+    <None Remove="Libs\PhaseLimiter\bin\zstd.dll" />
+    <None Remove="Libs\PhaseLimiter\resource\sound_quality2_cache" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libs\ffmpeg.exe" />
+    <Content Include="Libs\PhaseLimiter\bin\audio_analyzer.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\audio_visualizer.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\boost_filesystem.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\boost_iostreams.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\boost_math_tr1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\boost_serialization.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\boost_system.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\build_test.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\clear_mixer.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\effect_test.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\libbz2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\phase_limiter.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\sndfile.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\snd_file_info.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\spectrogram.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\tbb.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\tbbmalloc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\zlib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\bin\zstd.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libs\PhaseLimiter\resource\sound_quality2_cache">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.3.260402-preview2" PrivateAssets="all" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.RadialGauge" Version="8.3.260402-preview2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- Publish Properties -->
+  <PropertyGroup>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+  </PropertyGroup>
+</Project>
