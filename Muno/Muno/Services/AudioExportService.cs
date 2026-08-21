@@ -5,7 +5,7 @@ using Muno.Models;
 namespace Muno.Services;
 
 /// <summary>
-/// Exports audio files to supported formats using ffmpeg.
+/// Exports mastered audio files, preserving the original encoded file when the requested format matches.
 /// </summary>
 public sealed class AudioExportService : IAudioExportService
 {
@@ -30,13 +30,6 @@ public sealed class AudioExportService : IAudioExportService
                 return Result.Failure("The mastered audio file is no longer available.");
             }
 
-            var ffmpegPath = Path.Combine(AppContext.BaseDirectory, "Libs", "ffmpeg.exe");
-            if (!File.Exists(ffmpegPath))
-            {
-                _logger.LogError("ffmpeg executable was not found: {Path}", ffmpegPath);
-                return Result.Failure("The audio export engine is not available.");
-            }
-
             var destinationDirectory = Path.GetDirectoryName(destinationPath);
             if (string.IsNullOrWhiteSpace(destinationDirectory))
             {
@@ -45,56 +38,17 @@ public sealed class AudioExportService : IAudioExportService
 
             Directory.CreateDirectory(destinationDirectory);
 
-            var startInfo = new ProcessStartInfo
+            if (IsSameFormat(sourcePath, format))
             {
-                FileName = ffmpegPath,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-
-            startInfo.ArgumentList.Add("-y");
-            startInfo.ArgumentList.Add("-i");
-            startInfo.ArgumentList.Add(sourcePath);
-            startInfo.ArgumentList.Add("-vn");
-            AddFormatArguments(startInfo.ArgumentList, format);
-            startInfo.ArgumentList.Add(destinationPath);
-
-            using var process = new Process { StartInfo = startInfo };
-            if (!process.Start())
-            {
-                _logger.LogError("Failed to start ffmpeg export process.");
-                return Result.Failure("Failed to start the audio export.");
+                await CopyWithoutReencodingAsync(sourcePath, destinationPath, cancellationToken);
+                _logger.LogInformation(
+                    "Exported mastered audio without re-encoding: {SourcePath} -> {DestinationPath}",
+                    sourcePath,
+                    destinationPath);
+                return Result.Success();
             }
 
-            using var cancellationRegistration = cancellationToken.Register(() =>
-            {
-                try
-                {
-                    process.Kill(entireProcessTree: true);
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            });
-
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
-            await process.WaitForExitAsync(cancellationToken);
-            var stderr = await stderrTask;
-            await stdoutTask;
-
-            if (process.ExitCode != 0)
-            {
-                _logger.LogWarning(
-                    "ffmpeg export failed with exit code {ExitCode}: {Error}",
-                    process.ExitCode,
-                    stderr);
-                return Result.Failure("Failed to export the mastered audio.");
-            }
-
-            return Result.Success();
+            return await ConvertAsync(sourcePath, destinationPath, format, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -105,6 +59,107 @@ public sealed class AudioExportService : IAudioExportService
             _logger.LogError(ex, "Unexpected error while exporting mastered audio.");
             return Result.Failure("Failed to export the mastered audio.");
         }
+    }
+
+    private static async Task CopyWithoutReencodingAsync(
+        string sourcePath,
+        string destinationPath,
+        CancellationToken cancellationToken)
+    {
+        await using var source = new FileStream(
+            sourcePath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 81920,
+            useAsync: true);
+
+        await using var destination = new FileStream(
+            destinationPath,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 81920,
+            useAsync: true);
+
+        await source.CopyToAsync(destination, cancellationToken);
+    }
+
+    private async Task<Result> ConvertAsync(
+        string sourcePath,
+        string destinationPath,
+        OutputFormat format,
+        CancellationToken cancellationToken)
+    {
+        var ffmpegPath = Path.Combine(AppContext.BaseDirectory, "Libs", "ffmpeg.exe");
+        if (!File.Exists(ffmpegPath))
+        {
+            _logger.LogError("ffmpeg executable was not found: {Path}", ffmpegPath);
+            return Result.Failure("The audio export engine is not available.");
+        }
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = ffmpegPath,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+
+        startInfo.ArgumentList.Add("-y");
+        startInfo.ArgumentList.Add("-i");
+        startInfo.ArgumentList.Add(sourcePath);
+        startInfo.ArgumentList.Add("-vn");
+        AddFormatArguments(startInfo.ArgumentList, format);
+        startInfo.ArgumentList.Add(destinationPath);
+
+        using var process = new Process { StartInfo = startInfo };
+        if (!process.Start())
+        {
+            _logger.LogError("Failed to start ffmpeg export process.");
+            return Result.Failure("Failed to start the audio export.");
+        }
+
+        using var cancellationRegistration = cancellationToken.Register(() =>
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        });
+
+        var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
+        await process.WaitForExitAsync(cancellationToken);
+        var stderr = await stderrTask;
+        await stdoutTask;
+
+        if (process.ExitCode != 0)
+        {
+            _logger.LogWarning(
+                "ffmpeg export failed with exit code {ExitCode}: {Error}",
+                process.ExitCode,
+                stderr);
+            return Result.Failure("Failed to export the mastered audio.");
+        }
+
+        return Result.Success();
+    }
+
+    private static bool IsSameFormat(string sourcePath, OutputFormat format)
+    {
+        var sourceExtension = Path.GetExtension(sourcePath);
+        return format switch
+        {
+            OutputFormat.Wav => sourceExtension.Equals(".wav", StringComparison.OrdinalIgnoreCase),
+            OutputFormat.Mp3 => sourceExtension.Equals(".mp3", StringComparison.OrdinalIgnoreCase),
+            OutputFormat.Aac => sourceExtension.Equals(".aac", StringComparison.OrdinalIgnoreCase),
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported export format.")
+        };
     }
 
     private static void AddFormatArguments(IList<string> arguments, OutputFormat format)
