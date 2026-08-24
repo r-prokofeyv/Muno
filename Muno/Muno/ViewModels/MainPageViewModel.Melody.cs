@@ -37,6 +37,17 @@ public sealed partial class MainPageViewModel
         _melodySimplificationService = service;
     }
 
+    /// <summary>
+    /// Cancels a running melody simplification operation.
+    /// </summary>
+    public void CancelMelodySimplification()
+    {
+        if (_melodyCancellationTokenSource is { IsCancellationRequested: false })
+        {
+            _melodyCancellationTokenSource.Cancel();
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanSimplifyMelody))]
     private async Task SimplifyMelodyAsync()
     {
