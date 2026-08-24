@@ -78,6 +78,17 @@ public partial class App : Application
         services.AddSingleton<IMelodySimplificationService, MelodySimplificationService>();
 
         // ViewModels
-        services.AddTransient<MainPageViewModel>();
+        services.AddTransient(provider =>
+        {
+            var viewModel = new MainPageViewModel(
+                provider.GetRequiredService<IAudioFileLoaderService>(),
+                provider.GetRequiredService<IAudioPlaybackService>(),
+                provider.GetRequiredService<IAudioExportService>(),
+                provider.GetRequiredService<IMasteringSessionService>(),
+                provider.GetRequiredService<ILogger<MainPageViewModel>>());
+            viewModel.SetMelodySimplificationService(
+                provider.GetRequiredService<IMelodySimplificationService>());
+            return viewModel;
+        });
     }
 }
