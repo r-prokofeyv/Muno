@@ -75,6 +75,7 @@ public partial class App : Application
         services.AddSingleton<IAudioExportService, AudioExportService>();
         services.AddSingleton<IPhaseLimiterEngine, PhaseLimiterEngine>();
         services.AddSingleton<IMasteringSessionService, MasteringSessionService>();
+        services.AddSingleton<IMelodySimplificationService, MelodySimplificationService>();
 
         // ViewModels
         services.AddTransient<MainPageViewModel>();
