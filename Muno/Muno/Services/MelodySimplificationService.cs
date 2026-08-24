@@ -150,8 +150,8 @@ public sealed class MelodySimplificationService : IMelodySimplificationService
     }
 
     /// <summary>
-    /// Selects one coherent path through polyphonic candidates. The score rewards audible,
-    /// sustained notes and penalizes large jumps, long gaps, and overlapping candidates.
+    /// Selects coherent monophonic paths through polyphonic candidates. Long silent gaps split the
+    /// song into independent phrases so one high-scoring chorus cannot discard the rest of the track.
     /// </summary>
     private static List<Note> SelectDominantMelody(IReadOnlyCollection<Note> detectedNotes)
     {
@@ -166,6 +166,32 @@ public sealed class MelodySimplificationService : IMelodySimplificationService
             return [];
         }
 
+        var selected = new List<Note>();
+        var segment = new List<Note>();
+        var segmentEnd = candidates[0].EndTime;
+
+        foreach (var candidate in candidates)
+        {
+            if (segment.Count > 0 && candidate.StartTime - segmentEnd > MaximumTransitionGapSeconds)
+            {
+                selected.AddRange(SelectDominantPath(segment));
+                segment.Clear();
+            }
+
+            segment.Add(candidate);
+            segmentEnd = Math.Max(segmentEnd, candidate.EndTime);
+        }
+
+        if (segment.Count > 0)
+        {
+            selected.AddRange(SelectDominantPath(segment));
+        }
+
+        return MergeAdjacentNotes(RemoveOverlaps(selected));
+    }
+
+    private static List<Note> SelectDominantPath(IReadOnlyList<Note> candidates)
+    {
         var scores = new double[candidates.Count];
         var previous = new int[candidates.Count];
         Array.Fill(previous, -1);
@@ -214,7 +240,7 @@ public sealed class MelodySimplificationService : IMelodySimplificationService
         }
 
         path.Reverse();
-        return MergeAdjacentNotes(RemoveOverlaps(path));
+        return path;
     }
 
     private static bool IsMelodyCandidate(Note note)
