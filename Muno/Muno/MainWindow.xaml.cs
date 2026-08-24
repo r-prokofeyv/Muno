@@ -35,6 +35,7 @@ namespace Muno
 
         private void MainWindow_Closed(object sender, WindowEventArgs args)
         {
+            RootPage.ViewModel.CancelMelodySimplification();
             RootPage.ViewModel.PrepareForShutdown();
         }
     }
