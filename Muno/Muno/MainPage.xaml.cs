@@ -34,7 +34,8 @@ public sealed partial class MainPage : Page
 
     private void Grid_DragOver(object sender, DragEventArgs e)
     {
-        if (e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+        if (ViewModel.CanUsePrimaryActions
+            && e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
         {
             e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
         }
@@ -42,7 +43,8 @@ public sealed partial class MainPage : Page
 
     private async void Grid_Drop(object sender, DragEventArgs e)
     {
-        if (!e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+        if (!ViewModel.CanUsePrimaryActions
+            || !e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
         {
             return;
         }
