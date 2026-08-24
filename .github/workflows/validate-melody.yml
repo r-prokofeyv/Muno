@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/melody-simplification
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
