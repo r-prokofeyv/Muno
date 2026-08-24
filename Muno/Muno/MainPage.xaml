@@ -23,26 +23,26 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <CommandBar Grid.Row="0" DefaultLabelPosition="Right"  HorizontalAlignment="Left" HorizontalContentAlignment="Center">
+        <CommandBar Grid.Row="0" DefaultLabelPosition="Right" HorizontalAlignment="Left" HorizontalContentAlignment="Center">
             <CommandBar.PrimaryCommands>
+                <AppBarButton
+                    Icon="OpenFile"
+                    Label="Open File"
+                    IsEnabled="{x:Bind ViewModel.CanUsePrimaryActions, Mode=OneWay}"
+                    Command="{x:Bind ViewModel.OpenFileCommand}" />
+
+                <AppBarSeparator />
 
                 <AppBarButton
-                Icon="OpenFile"
-                Label="Open File"
-                Command="{x:Bind ViewModel.OpenFileCommand}" />
-             
-            <AppBarSeparator />
-
-            <AppBarButton
                     Command="{x:Bind ViewModel.PlayPauseCommand}"
                     IsEnabled="{x:Bind ViewModel.HasAudioFile, Mode=OneWay}"
                     HorizontalAlignment="Center"
                     Margin="0,0,0,8">
-                <FontIcon
+                    <FontIcon
                         FontFamily="Segoe Fluent Icons"
                         Glyph="{x:Bind ViewModel.IsPlaying, Mode=OneWay, Converter={StaticResource PlaybackGlyphConverter}}" />
-            </AppBarButton>
-                </CommandBar.PrimaryCommands>
+                </AppBarButton>
+            </CommandBar.PrimaryCommands>
         </CommandBar>
 
         <Grid Grid.Row="1" Padding="16" ColumnSpacing="16">
@@ -61,8 +61,6 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-
-
                 <TextBlock
                     Grid.Row="1"
                     Text="{x:Bind ViewModel.PositionText, Mode=OneWay}"
@@ -76,7 +74,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0"  Spacing="20">
+                    <StackPanel Grid.Column="0" Spacing="20">
                         <TextBlock Text="Target loudness" FontSize="22" HorizontalAlignment="Center" />
                         <controls:RadialGauge
                             Minimum="-20"
@@ -87,7 +85,7 @@
                             Value="{x:Bind ViewModel.TargetLoudness, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="20">
-                        <TextBlock Text="Mastering intensity" FontSize="22"  HorizontalAlignment="Center" />
+                        <TextBlock Text="Mastering intensity" FontSize="22" HorizontalAlignment="Center" />
                         <controls:RadialGauge
                             Minimum="0"
                             Maximum="100"
@@ -97,7 +95,7 @@
                             Value="{x:Bind ViewModel.MasteringIntensity, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Spacing="20">
-                        <TextBlock Text="True peak ceiling" FontSize="22"  HorizontalAlignment="Center" />
+                        <TextBlock Text="True peak ceiling" FontSize="22" HorizontalAlignment="Center" />
                         <controls:RadialGauge
                             Minimum="-6"
                             Maximum="0"
@@ -117,13 +115,23 @@
                     <ToggleSwitch
                         Header="Preserve bass"
                         IsOn="{x:Bind ViewModel.PreserveBass, Mode=TwoWay}" />
-                    <Button
+                    <StackPanel
                         Grid.Column="1"
-                        Content="Master"
-                        Command="{x:Bind ViewModel.MasterCommand}"
-                        Style="{StaticResource AccentButtonStyle}"
+                        Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Padding="24,8" />
+                        Spacing="8">
+                        <Button
+                            Content="Simplify melody"
+                            Command="{x:Bind ViewModel.SimplifyMelodyCommand}"
+                            Padding="18,8"
+                            ToolTipService.ToolTip="Extract one dominant MIDI melody and render it to MP3" />
+                        <Button
+                            Content="Master"
+                            Command="{x:Bind ViewModel.MasterCommand}"
+                            IsEnabled="{x:Bind ViewModel.CanUsePrimaryActions, Mode=OneWay}"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Padding="24,8" />
+                    </StackPanel>
                 </Grid>
 
                 <StackPanel Grid.Row="4" Spacing="8">
@@ -184,8 +192,8 @@
                             <DataTemplate x:DataType="models:TrackVariant">
                                 <Grid Padding="4" HorizontalAlignment="Stretch">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="4" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -193,11 +201,12 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{x:Bind DisplayName}" FontSize="20" VerticalAlignment="Center" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
-                                        <TextBlock HorizontalAlignment="Right"
-                                                Text="Failed"
-                                                Foreground="Red"
-                                                VerticalAlignment="Center"
-                                                Visibility="{x:Bind State, Converter={StaticResource VariantStateVisualConverter}, ConverterParameter=Failed}" />
+                                        <TextBlock
+                                            HorizontalAlignment="Right"
+                                            Text="Failed"
+                                            Foreground="Red"
+                                            VerticalAlignment="Center"
+                                            Visibility="{x:Bind State, Converter={StaticResource VariantStateVisualConverter}, ConverterParameter=Failed}" />
                                         <Button
                                             Width="32"
                                             Height="32"
@@ -214,15 +223,15 @@
                                             </Button.Flyout>
                                         </Button>
                                     </StackPanel>
-                                        <ProgressBar
-                                            Grid.Column="0"
-                                            Grid.ColumnSpan="2"
-                                            Grid.Row="1"
-                                            Maximum="1000"
-                                            Minimum="0"
-                                            HorizontalAlignment="Stretch"
-                                            Value="{x:Bind Progress, Mode=OneWay}"
-                                            Visibility="{x:Bind State, Converter={StaticResource VariantStateVisualConverter}, ConverterParameter=Processing}" />
+                                    <ProgressBar
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="2"
+                                        Grid.Row="1"
+                                        Maximum="1000"
+                                        Minimum="0"
+                                        HorizontalAlignment="Stretch"
+                                        Value="{x:Bind Progress, Mode=OneWay}"
+                                        Visibility="{x:Bind State, Converter={StaticResource VariantStateVisualConverter}, ConverterParameter=Processing}" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
