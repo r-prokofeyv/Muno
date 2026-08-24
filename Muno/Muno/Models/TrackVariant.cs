@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Muno.Models;
 
 /// <summary>
-/// Represents an original or mastered variant of an audio track.
+/// Represents an original, mastered, or melody-derived variant of an audio track.
 /// </summary>
 public sealed partial class TrackVariant : ObservableObject
 {
@@ -16,6 +16,11 @@ public sealed partial class TrackVariant : ObservableObject
     /// Gets or sets the path to the variant's audio file.
     /// </summary>
     public required string AudioFilePath { get; set; }
+
+    /// <summary>
+    /// Gets or sets the intermediate MIDI file path for melody variants, when available.
+    /// </summary>
+    public string? MidiFilePath { get; set; }
 
     /// <summary>
     /// Gets the kind of this track variant.
@@ -40,16 +45,16 @@ public sealed partial class TrackVariant : ObservableObject
     public partial VariantState State { get; set; }
 
     /// <summary>
-    /// Gets whether this variant has a completed mastering output that can be exported.
+    /// Gets whether this non-original variant has completed audio that can be exported.
     /// </summary>
     public bool CanExport =>
-        Kind == VariantKind.Mastering
+        Kind != VariantKind.Original
         && State == VariantState.Ready
         && !string.IsNullOrWhiteSpace(AudioFilePath)
         && File.Exists(AudioFilePath);
 
     /// <summary>
-    /// Gets or sets the processing progress from 0 to 1.
+    /// Gets or sets the processing progress value used by the versions list.
     /// </summary>
     [ObservableProperty]
     public partial double Progress { get; set; }
