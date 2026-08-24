@@ -103,6 +103,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BasicPitch" Version="1.0.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.3.260402-preview2" PrivateAssets="all" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.RadialGauge" Version="8.3.260402-preview2" PrivateAssets="all" />
@@ -111,6 +112,7 @@
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Serilog" Version="4.4.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
