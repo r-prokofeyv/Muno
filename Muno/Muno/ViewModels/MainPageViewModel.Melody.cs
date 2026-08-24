@@ -35,6 +35,8 @@ public sealed partial class MainPageViewModel
     internal void SetMelodySimplificationService(IMelodySimplificationService service)
     {
         _melodySimplificationService = service;
+        _masteringSessionService.StateChanged += OnMelodyRelevantSessionStateChanged;
+        RefreshMelodyCommandState();
     }
 
     /// <summary>
@@ -46,6 +48,17 @@ public sealed partial class MainPageViewModel
         {
             _melodyCancellationTokenSource.Cancel();
         }
+    }
+
+    private void OnMelodyRelevantSessionStateChanged(object? sender, EventArgs e)
+    {
+        RefreshMelodyCommandState();
+    }
+
+    private void RefreshMelodyCommandState()
+    {
+        OnPropertyChanged(nameof(CanSimplifyMelody));
+        SimplifyMelodyCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanSimplifyMelody))]
