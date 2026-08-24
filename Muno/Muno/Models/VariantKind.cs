@@ -13,5 +13,10 @@ public enum VariantKind
     /// <summary>
     /// A mastered version of the track.
     /// </summary>
-    Mastering
+    Mastering,
+
+    /// <summary>
+    /// A simplified dominant-melody rendering derived from the original track.
+    /// </summary>
+    Melody
 }
